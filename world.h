@@ -1,5 +1,8 @@
 #pragma once
+#include "organism.h"
+#include <list>
 #include <ncurses.h>
+#include <vector>
 
 #define GREEN_COLOR 1
 #define RED_COLOR 2
@@ -12,11 +15,19 @@ public:
   World(int, int);
   ~World();
   void DrawWorld();
+  void DrawChar(char symbol, int color, int y, int x);
   void StartSimulation();
   void TakeATurn();
 
+  void AddOrganism(Organism *organism);
+  Organism * GetOrganism(int x,int y);
+
+  int getTurn();
+  int getWidth();
+  int getHeight();
+
 private:
-  int width;
-  int height;
+  int width, turn, height;
   WINDOW *window;
+  std::vector<Organism*> organisms;
 };

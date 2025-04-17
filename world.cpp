@@ -1,4 +1,5 @@
 #include "world.h"
+#include <algorithm>
 #include <ncurses.h>
 
 World::World(int width, int height) {
@@ -12,6 +13,7 @@ World::World(int width, int height) {
   this->window = window;
   this->width = width;
   this->height = height;
+  this->turn = 0;
 
   start_color();
   init_pair(GREEN_COLOR, COLOR_WHITE, COLOR_GREEN);
@@ -22,5 +24,35 @@ World::World(int width, int height) {
 }
 
 void World::DrawWorld() { wrefresh(this->window); }
+
+void World::DrawChar(char symbol, int color, int x, int y) {
+  wattron(this->window, COLOR_PAIR(color));
+  mvwaddch(this->window, y, x, symbol);
+  wattroff(this->window, COLOR_PAIR(color));
+}
+
+void World::TakeATurn() {
+  turn++;
+  std::sort(organisms.begin(), organisms.end(), Organism::priority);
+  for (Organism *org : organisms) {
+    if (org->getInitiative() > -1) {
+      org->action();
+    }
+  }
+}
+
+void World::AddOrganism(Organism *organism) { organisms.push_back(organism); }
+
+Organism *World::GetOrganism(int x, int y) {
+  if (x < 0 || x >= width || y < 0 || y >= height) {
+    return nullptr;
+  }
+  for (Organism *org : organisms) {
+    if (org->getX() == x && org->getY() == y) {
+      return org;
+    }
+  }
+  return nullptr;
+}
 
 World::~World() { delwin(this->window); }
